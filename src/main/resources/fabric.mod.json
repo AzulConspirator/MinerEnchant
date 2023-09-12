@@ -3,7 +3,7 @@
 	"id": "minerenchant",
 	"version": "${version}",
 	"name": "Miner's Enchant",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "adds a 3x3 area mining enchantment",
 	"authors": [
 		"AzulConspirator"
 	],
