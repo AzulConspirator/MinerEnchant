@@ -1,8 +1,10 @@
-# Fabric Example Mod
 
-## Setup
+<p align="center"><img src="src\main\resources\assets\minerenchant\icon.png" alt="Logo" width="200"></p>
 
-For setup instructions please see the [fabric wiki page](https://fabricmc.net/wiki/tutorial:setup) that relates to the IDE that you are using.
+# Miner's Enchant
+
+since hammer and excavator mods are weirdly absent, so ive made this mod.
+its a 3x3 area mining enchantment for Pickaxe and Shovel.
 
 ## License
 

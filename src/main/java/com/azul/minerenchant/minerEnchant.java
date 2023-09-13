@@ -14,7 +14,7 @@ public class minerEnchant implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Registering Miner's Enchant");
+		LOGGER.info("Registering Miner's Enchant...");
 		modEnchantments.registerModEnchantments();
 	}
 }
