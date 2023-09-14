@@ -8,8 +8,7 @@
 		"AzulConspirator"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": ""
+		"sources": "https://github.com/AzulConspirator/MinerEnchant/"
 	},
 	"license": "MIT",
 	"icon": "assets/minerenchant/icon.png",
