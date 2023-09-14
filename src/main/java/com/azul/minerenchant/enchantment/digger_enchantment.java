@@ -1,5 +1,7 @@
 package com.azul.minerenchant.enchantment;
 
+import com.azul.minerenchant.util.BlockFinder;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.Enchantment;
@@ -15,7 +17,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.block.Block;
-import net.minecraft.util.math.Direction;
+
+import static net.minecraft.enchantment.Enchantments.FORTUNE;
+
 
 public class digger_enchantment  extends Enchantment
 {
@@ -29,47 +33,67 @@ public class digger_enchantment  extends Enchantment
         return true;
      }
 
+     @Override
+     public int getMaxLevel() {
+        return 2;
+     }
+     @Override
+     public int getMinPower(int level) {
+         return 15 + (level - 1) * 9;
+     }
+ 
+     @Override
+     public int getMaxPower(int level) {
+         return super.getMinPower(level) + 50;
+     }
+ 
+     @Override
+     protected boolean canAccept(Enchantment other) {
+         return super.canAccept(other) && other != FORTUNE;
+     }
+     
     public void onBlockBreak(PlayerEntity player, BlockPos pos, ItemStack stack, int level) 
     {
         World world;
         int damage = 1;
+        int depth = 0 ;
         if ((world = player.getWorld()).isClient) return;
 
         Iterable<BlockPos> iterable = null;
-        if (level == 1) 
-        {
+        if (level > 0) 
+        {   
             BlockHitResult blockHitResult = (BlockHitResult) player.raycast(4.5f, 1, false);
             var facing = blockHitResult.getSide().getOpposite();
-            var pos2 = pos.offset(facing, 0);
-            
-            if (facing.equals(Direction.DOWN) || facing.equals(Direction.UP)) 
+            if (level == 1) 
             {
-                iterable = BlockPos.iterate(pos.east().offset(Direction.NORTH),pos2.west().offset(Direction.SOUTH));
+                depth = 0;
             } 
-            else
+            if (level == 2) 
             {
-                iterable = BlockPos.iterate(pos.down().offset(facing.rotateCounterclockwise(Direction.Axis.Y)),pos2.up().offset(facing.rotateClockwise(Direction.Axis.Y)));
-            }
+                depth = 1;
+            } 
+            iterable = this.getBlockFinder().findBlocks(facing,pos,depth);
         }
 
         for (BlockPos blockPos : iterable) 
         {
-            damage++;
             if (!world.canPlayerModifyAt(player, pos)) continue;
             BlockState blockState = world.getBlockState(blockPos);
-            BlockEntity blockEntity = world.getBlockState(pos).hasBlockEntity() ? world.getBlockEntity(pos) : null;
-
-            if (!blockState.isSolidBlock(world, blockPos) || !stack.isSuitableFor(blockState)) continue;
+            if (!blockState.isSolidBlock(world, blockPos) || !stack.isSuitableFor(blockState) || blockState.isToolRequired()) continue;
             world.syncWorldEvent(14004, blockPos, 0);
             if (pos.equals(blockPos)) continue;
-            if (blockState.isIn(BlockTags.GUARDED_BY_PIGLINS)) {
+            BlockEntity blockEntity = world.getBlockState(blockPos).hasBlockEntity() ? world.getBlockEntity(blockPos) : null;
+
+            if (blockState.isIn(BlockTags.GUARDED_BY_PIGLINS)) 
+            {
                 PiglinBrain.onGuardedBlockInteracted(player, false);
             }
             world.emitGameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Emitter.of(player, blockState));
-            if (world.removeBlock(blockPos, false)) {
+            if (world.removeBlock(blockPos, false)) 
+            {
                 blockState.getBlock().onBroken(world, blockPos, blockState);
             }
-            
+            damage++;
             // only drop items in creative
             if(!player.isCreative()) 
             {
@@ -78,7 +102,16 @@ public class digger_enchantment  extends Enchantment
                 world.breakBlock(blockPos, false, player);
                 blockState.onStacksDropped((ServerWorld) world, blockPos, player.getMainHandStack(), true);
             }
+            else
+            {
+                damage++;
+            }
         }
         stack.damage(damage+1, player, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+    }
+
+    public BlockFinder getBlockFinder()
+    {
+       return BlockFinder.DEFAULT;
     }
 }

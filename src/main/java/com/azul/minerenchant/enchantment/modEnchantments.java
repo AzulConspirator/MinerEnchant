@@ -11,7 +11,7 @@ import net.minecraft.util.Identifier;
 
 public class modEnchantments 
 {
-    public static Enchantment DIGGER = register("digger",new digger_enchantment(Enchantment.Rarity.UNCOMMON, EnchantmentTarget.DIGGER, EquipmentSlot.MAINHAND));
+    public static Enchantment DIGGER = register("digger",new digger_enchantment(Enchantment.Rarity.RARE, EnchantmentTarget.DIGGER, EquipmentSlot.MAINHAND));
     
     private static Enchantment register(String name,Enchantment enchantment)
     {
